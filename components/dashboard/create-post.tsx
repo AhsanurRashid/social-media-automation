@@ -111,9 +111,9 @@ export default function CreatePost() {
               <Button type="submit" disabled={pending || platforms.length === 0}>
                 {pending ? "Publishing..." : "Publish"}
               </Button>
-              <Button type="button" variant="outline">Save Draft</Button>
+              <Button type="button" variant="outline">Save to Draft</Button>
               <Button type="button" variant="ghost" onClick={handleReset}>
-                Reset
+                Reset Post
               </Button>
             </div>
           </form>
