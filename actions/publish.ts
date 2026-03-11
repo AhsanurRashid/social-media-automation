@@ -83,7 +83,9 @@ async function postToX(text: string): Promise<void> {
 
   if (!res.ok) {
     const error = await res.json();
-    throw new Error(error?.detail ?? error?.title ?? "Failed to post to X.");
+    throw new Error(
+      `X API ${res.status}: ${error?.detail ?? error?.title ?? error?.errors?.[0]?.message ?? JSON.stringify(error)}`
+    );
   }
 }
 
