@@ -1,4 +1,6 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# social-sass-app-mvp
+
+A [Next.js](https://nextjs.org) application built with [shadcn/ui](https://ui.shadcn.com) components and Tailwind CSS.
 
 ## Getting Started
 
