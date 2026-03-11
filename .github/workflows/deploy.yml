@@ -19,7 +19,8 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             cd ~/social-media-automation
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
             npm install --production=false
             npm run build
             pm2 restart social-sass-app

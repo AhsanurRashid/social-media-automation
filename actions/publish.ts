@@ -40,7 +40,7 @@ async function postToX(text: string): Promise<void> {
   const oauthParams: Record<string, string> = {
     oauth_consumer_key: apiKey,
     oauth_nonce: oauthNonce,
-    oauth_signature_method: "HMAC-SHA256",
+    oauth_signature_method: "HMAC-SHA1",
     oauth_timestamp: oauthTimestamp,
     oauth_token: accessToken,
     oauth_version: "1.0",
@@ -62,7 +62,7 @@ async function postToX(text: string): Promise<void> {
   const cryptoKey = await crypto.subtle.importKey(
     "raw",
     encoder.encode(signingKey),
-    { name: "HMAC", hash: "SHA-256" },
+    { name: "HMAC", hash: "SHA-1" },
     false,
     ["sign"]
   );
