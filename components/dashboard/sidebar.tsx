@@ -12,6 +12,7 @@ import {
   LogOut,
   PenSquare,
 } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -29,7 +30,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="flex h-screen w-64 flex-shrink-0 flex-col border-r bg-card">
+    <aside className="flex h-screen w-64 shrink-0 flex-col border-r bg-card">
       {/* Logo */}
       <div className="flex h-16 items-center px-6">
         <span className="text-lg font-bold tracking-tight">SocialSaaS</span>

@@ -91,11 +91,80 @@ async function postToX(text: string): Promise<void> {
 
 // ─── TikTok ───────────────────────────────────────────────────────────────────
 
-async function postToTikTok(text: string): Promise<void> {
-  void text;
-  // TikTok Content Posting API requires OAuth 2.0 + video upload flow.
-  // Configure TIKTOK_ACCESS_TOKEN in your environment when ready.
-  throw new Error("TikTok integration is not yet configured.");
+interface TikTokOptions {
+  video: File;
+  title: string;
+  privacyLevel: string;
+  disableComment: boolean;
+  disableDuet: boolean;
+  disableStitch: boolean;
+}
+
+async function postToTikTok(opts: TikTokOptions): Promise<void> {
+  const accessToken = process.env.TIKTOK_ACCESS_TOKEN;
+  if (!accessToken) {
+    throw new Error("TikTok credentials are not configured (missing TIKTOK_ACCESS_TOKEN).");
+  }
+
+  const CHUNK_SIZE = 10 * 1024 * 1024; // 10 MB
+  const videoSize = opts.video.size;
+  const totalChunks = Math.ceil(videoSize / CHUNK_SIZE);
+
+  // Step 1 — Initialise the upload
+  const initRes = await fetch("https://open.tiktokapis.com/v2/post/publish/video/init/", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json; charset=UTF-8",
+    },
+    body: JSON.stringify({
+      post_info: {
+        title: opts.title,
+        privacy_level: opts.privacyLevel,
+        disable_comment: opts.disableComment,
+        disable_duet: opts.disableDuet,
+        disable_stitch: opts.disableStitch,
+      },
+      source_info: {
+        source: "FILE_UPLOAD",
+        video_size: videoSize,
+        chunk_size: CHUNK_SIZE,
+        total_chunk_count: totalChunks,
+      },
+    }),
+  });
+
+  const initJson = await initRes.json();
+  if (!initRes.ok || initJson?.error?.code !== "ok") {
+    throw new Error(
+      initJson?.error?.message ?? `TikTok init failed (HTTP ${initRes.status}).`
+    );
+  }
+
+  const { upload_url: uploadUrl } = initJson.data as { publish_id: string; upload_url: string };
+
+  // Step 2 — Upload video in chunks
+  const videoBuffer = await opts.video.arrayBuffer();
+  for (let i = 0; i < totalChunks; i++) {
+    const start = i * CHUNK_SIZE;
+    const end = Math.min(start + CHUNK_SIZE, videoSize) - 1;
+    const chunk = videoBuffer.slice(start, end + 1);
+
+    const uploadRes = await fetch(uploadUrl, {
+      method: "PUT",
+      headers: {
+        "Content-Type": opts.video.type || "video/mp4",
+        "Content-Length": String(end - start + 1),
+        "Content-Range": `bytes ${start}-${end}/${videoSize}`,
+      },
+      body: chunk,
+    });
+
+    // TikTok returns 2xx (often 206 Partial Content) for each chunk
+    if (!uploadRes.ok && uploadRes.status !== 206) {
+      throw new Error(`TikTok chunk upload failed at chunk ${i + 1} (HTTP ${uploadRes.status}).`);
+    }
+  }
 }
 
 // ─── Instagram ────────────────────────────────────────────────────────────────
@@ -182,6 +251,13 @@ export async function publishPostAction(
   const message = `${title}\n\n${content}`;
   const results: PublishFormState["results"] = [];
 
+  // TikTok-specific options from FormData
+  const tiktokVideo = formData.get("tiktok_video");
+  const tiktokPrivacy = formData.get("tiktok_privacy")?.toString() ?? "PUBLIC_TO_EVERYONE";
+  const tiktokDisableComment = formData.get("tiktok_disable_comment") === "true";
+  const tiktokDisableDuet    = formData.get("tiktok_disable_duet")    === "true";
+  const tiktokDisableStitch  = formData.get("tiktok_disable_stitch")  === "true";
+
   await Promise.allSettled(
     platforms.map(async (platform) => {
       try {
@@ -203,10 +279,22 @@ export async function publishPostAction(
             results.push({ platform: "X", success: true, message: "Published successfully." });
             break;
           }
-          case "tiktok":
-            await postToTikTok(message);
+          case "tiktok": {
+            if (!(tiktokVideo instanceof File) || tiktokVideo.size === 0) {
+              results.push({ platform: "TikTok", success: false, message: "Please select a video file to upload." });
+              break;
+            }
+            await postToTikTok({
+              video: tiktokVideo,
+              title: title ?? "",
+              privacyLevel: tiktokPrivacy,
+              disableComment: tiktokDisableComment,
+              disableDuet: tiktokDisableDuet,
+              disableStitch: tiktokDisableStitch,
+            });
             results.push({ platform: "TikTok", success: true, message: "Published successfully." });
             break;
+          }
           case "instagram":
             await postToInstagram(message);
             results.push({ platform: "Instagram", success: true, message: "Published successfully." });

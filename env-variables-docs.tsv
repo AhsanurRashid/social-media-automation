@@ -1,0 +1,14 @@
+Variable Name	Platform / Service	Description	How to Get It	Required?	Status
+OPENAI_API_KEY	OpenAI	API key for AI post generation	https://platform.openai.com/api-keys	Yes	Filled
+FACEBOOK_PAGE_ID	Facebook (Meta)	The numeric ID of your Facebook Page	Facebook Page → About → Page ID (or Graph API Explorer)	Yes	Filled
+FACEBOOK_PAGE_ACCESS_TOKEN	Facebook (Meta)	Long-lived access token for posting to a Facebook Page	Meta for Developers → Graph API Explorer → Generate Page Access Token	Yes	Filled
+X_API_KEY	X (Twitter)	Consumer/App API Key	https://developer.twitter.com/en/portal/dashboard → Your App → Keys and Tokens	Yes	Filled
+X_API_SECRET	X (Twitter)	Consumer/App API Secret	https://developer.twitter.com/en/portal/dashboard → Your App → Keys and Tokens	Yes	Filled
+X_ACCESS_TOKEN	X (Twitter)	User Access Token (OAuth 1.0a)	https://developer.twitter.com/en/portal/dashboard → Your App → Keys and Tokens	Yes	Filled
+X_ACCESS_TOKEN_SECRET	X (Twitter)	User Access Token Secret (OAuth 1.0a)	https://developer.twitter.com/en/portal/dashboard → Your App → Keys and Tokens	Yes	Filled
+X_BEARER_TOKEN	X (Twitter)	App-only Bearer Token for read operations	https://developer.twitter.com/en/portal/dashboard → Your App → Keys and Tokens	Yes	Filled
+TIKTOK_ACCESS_TOKEN	TikTok	OAuth access token for TikTok Content Posting API	https://developers.tiktok.com/ → Login Kit / Content Posting API OAuth flow	Yes	Filled
+INSTAGRAM_BUSINESS_ACCOUNT_ID	Instagram (Meta)	Numeric ID of your Instagram Business Account	Facebook Graph API: GET /me/accounts → linked IG account ID	Yes	Empty
+INSTAGRAM_ACCESS_TOKEN	Instagram (Meta)	Page access token with instagram_basic + instagram_content_publish permissions	Meta for Developers → Graph API Explorer → generate token with IG permissions	Yes	Empty
+LINKEDIN_ACCESS_TOKEN	LinkedIn	OAuth 2.0 access token with w_member_social permission	https://www.linkedin.com/developers/ → OAuth 2.0 flow with w_member_social scope	Yes	Empty
+LINKEDIN_AUTHOR_URN	LinkedIn	Your LinkedIn member or organization URN (e.g. urn:li:person:xxxx)	Call GET https://api.linkedin.com/v2/me after OAuth to retrieve the `id` field	Yes	Empty
